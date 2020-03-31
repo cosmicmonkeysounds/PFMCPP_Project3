@@ -108,145 +108,157 @@ struct CarWash //2)
 
 /*
 1)
+Mixing board
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) number of channels 
+    2) number of buss'
+    3) does it have internal effects? (boolean)
+    4) has an EQ (boolean)
+    5) has a compressor (boolean)
 3 things it can do:
-    1)
-    2)
-    3)
+    1) mix channels together on master buss
+    2) mix and send signals to buss'
+    3) amplify/attenuate inputs
  */
 
 /*
 2)
+Oscilloscope 
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) number of BNC inputs 
+    2) is it analog? 
+    3) maximum input voltage 
+    4) number of channels in logic analyzer 
+    5) time constant of X-axis
 3 things it can do:
-    1)
-    2)
-    3)
+    1) count frequency of input
+    2) display waveform
+    3) attenuate/amplify waveform
  */
 
 /*
 3)
+Television
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) size of screen
+    2) aspect ratio (integer that selects the ratio)
+    3) number of HDMI ports
+    4) number of optical ports
+    5) is it smart? (boolean)
 3 things it can do:
-    1)
-    2)
-    3)
+    1) turn on and off
+    2) receive video from ports 
+    3) control it's pixels
  */
 
 /*
 4)
+Speakers
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) how many drivers?
+    2) lowest frequency reproducable at -3dB
+    3) highest frequency reproducable at -3dB
+    4) is it active?
+    5) power rating
 3 things it can do:
-    1)
-    2)
-    3)
+    1) output sound 
+    2) filter input through crossover(s)
+    3) set volume 
  */
 
 /*
 5)
+Oscillator 
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) waveform select
+    2) frequency
+    3) amplitude 
+    4) FM enabled
+    5) number of voices
 3 things it can do:
-    1)
-    2)
-    3)
+    1) read and quantize CV
+    2) output sound
+    3) mix voices together
  */
 
 /*
 6)
+LFO
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) value of tempo
+    2) swing amount 
+    3) waveform select 
+    4) minimum speed
+    5) maximum speed
 3 things it can do:
-    1)
-    2)
-    3)
+    1) read CV
+    2) output CV 
+    3) retrigger LFO
  */
 
 /*
 7)
+Sequencer
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) number of steps
+    2) restart sequence button (boolean)
+    3) value of tempo
+    4) swing amount
+    5) velocity value
 3 things it can do:
-    1)
-    2)
-    3)
+    1) write/record sequence 
+    2) play sequence 
+    3) output CV
  */
 
 /*
 8)
+VCA
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) number of inputs
+    2) number of outputs
+    3) input signal strength
+    4) output signal strength
+    5) distortion threshold
 3 things it can do:
-    1)
-    2)
-    3)
+    1) attenuate or increase gain
+    2) read CV
+    3) mix inputs/outputs together
  */
 
 /*
 9)
+Filter
 5 properties:
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) has low pass output
+    2) has band pass output
+    3) has hi pass output
+    4) cutoff frequency value
+    5) resonance value
 3 things it can do:
-    1)
-    2)
-    3)
+    1) read CV
+    2) apply filter to input
+    3) mix outputs together
  */
 
 /*
 10)
+Synthesizer
 5 properties:
  These 5 properties should be UDTs that you defined above.
  this goes along with the instruction:
     One of your 10 UDTs should only use UDTs for its member variable types.
-    1)
-    2)
-    3)
-    4)
-    5)
+    1) has a filter
+    2) has a vca
+    3) has a sequencer
+    4) has a lfo
+    5) has an oscillator 
+// all of these would be UDT's that would hold the implementation and specifics of each and NOT booleans
+
 3 things it can do:
-    1)
-    2)
-    3)
+    1) output sounds
+    2) read CV 
+    3) route CV in mod matrix
  */
 
 #include <iostream>
