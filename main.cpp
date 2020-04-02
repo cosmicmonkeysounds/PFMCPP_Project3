@@ -169,7 +169,6 @@ struct Oscilloscope
     // 5. Time constant on x-axis
     float xAxisTimeConstant = 96.5f;
 
-
     // 1. Count frequency of inputs
     float countFrequency(void* inputVoltage);
     // 2. Display input waveforms 
@@ -205,7 +204,6 @@ struct Television
     unsigned int numOfOptical = 1;
     // 5) is it smart?
     bool isItSmart = false;
-
 
     // 1) Turn on or off
     void powerCycle();
@@ -244,9 +242,9 @@ struct Speaker
     float powerRating = 80.f;
 
     // 1) output sound
-    void outputSound(void* signal);
+    void outputSound(void* signal); FIXME pointers have not been covered yet.  don't use them.
     // 2) filter input through crossover
-    void* applyCrossover(void* input); // was thinking this would return data that would be the filtered version of the input, which would leave it up to you how you'd like to store and use the filtered audio. 
+    void* applyCrossover(void* input); FIXME pointers have not been covered yet.  don't use them.
 
     // 3) set volume
     void setVolume(float volume);
@@ -281,11 +279,11 @@ struct Oscillator
     unsigned int numOfVoices = 2;
 
     // 1) read and quantize CV
-    void* readCV(void* CVSignal); 
+    void* readCV(void* CVSignal); FIXME pointers have not been covered yet.  don't use them.
     // 2) output sound
-    void outputSound(void* audioSignal);
+    void outputSound(void* audioSignal); FIXME pointers have not been covered yet.  don't use them.
     // 3) mix voices together 
-    void* mixVoices(void* voiceSignals);
+    void* mixVoices(void* voiceSignals); FIXME pointers have not been covered yet.  don't use them.
 };
 
 /*
@@ -317,7 +315,7 @@ struct LFO
     float maxSpeed = 255.f;
 
     // 1) read CV
-    void* readCV(void* CVInput);
+    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
     // 2) outputCV
     void outputCV(); // this takes no arguments because everything it needs to output is held in the member variables
     // 3) retrigger LFO
@@ -355,14 +353,14 @@ struct Sequencer
     // Nested UDT #1
     struct Sequence
     {
-        void* data;
-        void* instruments;
+        void* data; FIXME pointers have not been covered yet.  don't use them.
+        void* instruments; FIXME pointers have not been covered yet.  don't use them.
 
-        void* quantize(void* input);
+        void* quantize(void* input); FIXME pointers have not been covered yet.  don't use them.
     };
 
     // 1) write/record sequence
-    Sequence writeRecordSequence(void* input);
+    Sequence writeRecordSequence(void* input); FIXME pointers have not been covered yet.  don't use them.
     // 2) play sequence
     void playSequence(Sequence seq);
     // 3) output CV
@@ -398,11 +396,11 @@ struct VCA
     float clippingThresh = 60.55f;
 
     // 1) attenuate or increase gain
-    void* changeGain(void* input);
+    void* changeGain(void* input); FIXME pointers have not been covered yet.  don't use them.
     // 2) read CV
-    void* readCV(void* CVInput);
+    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
     // 3) mix inputs/outputs together
-    void* mixSignals(void* signals);
+    void* mixSignals(void* signals); FIXME pointers have not been covered yet.  don't use them.
 };
 
 /*
@@ -439,15 +437,15 @@ struct Filter
         float cutoffFreq, resonance;
         unsigned int topology;
 
-        void* transferFunction(void* input);
+        void* transferFunction(void* input); FIXME pointers have not been covered yet.  don't use them.
     };
 
     // 1) read CV
-    void readCV(void* CVInput);
+    void readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
     // 2) apply filter to input
-    void* applyFilter(void* input);
+    void* applyFilter(void* input); FIXME pointers have not been covered yet.  don't use them.
     // 3) mix outputs together
-    void* mixOutputs(void* outputs);
+    void* mixOutputs(void* outputs); FIXME pointers have not been covered yet.  don't use them.
 };
 
 /*
@@ -484,11 +482,11 @@ struct Synthesizer
     Oscillator oscillator;
 
     // 1) outputs sounds
-    void outputSound(void* signal);
+    void outputSound(void* signal); FIXME pointers have not been covered yet.  don't use them.
     // 2) reads CV
-    void* readCV(void* CVInput);
+    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
     // 3) routes CV in mod matrix
-    void routeCV(void* CVInput, unsigned int modMatrixDestination);
+    void routeCV(void* CVInput, unsigned int modMatrixDestination); FIXME pointers have not been covered yet.  don't use them.
 };
 
 #include <iostream>
