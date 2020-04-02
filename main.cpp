@@ -134,11 +134,11 @@ struct MixingBoard
     bool doesItHaveCompression = false;
 
     // 1. mixes channels together on master buss
-    void processMasterBuss(void* channelData);
+    float processMasterBuss(int channelData);
     // 2. mixes and sends signals to buss
-    void sendToBuss(void* channelData, unsigned int bussSelect);
+    void sendToBuss(int channelData, unsigned int bussSelect);
     // 3. changes the gain of signals 
-    void changeGain(void* channelData, float gain);
+    float changeGain(int channelData, float gain);
 };
 
 /*
@@ -170,11 +170,11 @@ struct Oscilloscope
     float xAxisTimeConstant = 96.5f;
 
     // 1. Count frequency of inputs
-    float countFrequency(void* inputVoltage);
+    float countFrequency(float inputVoltage);
     // 2. Display input waveforms 
-    void displayWaveform(void* inputVoltage);
+    void displayWaveform(float inputVoltage);
     // 3. amplify/attenuate input signals
-    void changeGain(void* inputVoltage, float gain);
+    float changeGain(float inputVoltage, float gain);
 };
 
 /*
@@ -206,9 +206,9 @@ struct Television
     bool isItSmart = false;
 
     // 1) Turn on or off
-    void powerCycle();
+    float powerCycle();
     // 2) receive video from ports
-    void readPorts(void* data);
+    int readPorts(int data);
     // 3) control it's pixels
     void controlPixel(unsigned int pixelNum, float brightness);
 };
@@ -242,12 +242,11 @@ struct Speaker
     float powerRating = 80.f;
 
     // 1) output sound
-    void outputSound(void* signal); FIXME pointers have not been covered yet.  don't use them.
+    float outputSound(float signal); 
     // 2) filter input through crossover
-    void* applyCrossover(void* input); FIXME pointers have not been covered yet.  don't use them.
-
+    float applyCrossover(float input); 
     // 3) set volume
-    void setVolume(float volume);
+    void setVolume(int volume);
 };
 
 /*
@@ -279,11 +278,11 @@ struct Oscillator
     unsigned int numOfVoices = 2;
 
     // 1) read and quantize CV
-    void* readCV(void* CVSignal); FIXME pointers have not been covered yet.  don't use them.
+    float readCV(float CVSignal);
     // 2) output sound
-    void outputSound(void* audioSignal); FIXME pointers have not been covered yet.  don't use them.
+    float outputSound(float audioSignal);
     // 3) mix voices together 
-    void* mixVoices(void* voiceSignals); FIXME pointers have not been covered yet.  don't use them.
+    float mixVoices(float voiceSignals);
 };
 
 /*
@@ -315,7 +314,7 @@ struct LFO
     float maxSpeed = 255.f;
 
     // 1) read CV
-    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
+    float readCV(float CVInput); 
     // 2) outputCV
     void outputCV(); // this takes no arguments because everything it needs to output is held in the member variables
     // 3) retrigger LFO
@@ -353,18 +352,18 @@ struct Sequencer
     // Nested UDT #1
     struct Sequence
     {
-        void* data; FIXME pointers have not been covered yet.  don't use them.
-        void* instruments; FIXME pointers have not been covered yet.  don't use them.
+        float data;
+        float instruments;
 
-        void* quantize(void* input); FIXME pointers have not been covered yet.  don't use them.
+        int quantize(float input);
     };
 
     // 1) write/record sequence
-    Sequence writeRecordSequence(void* input); FIXME pointers have not been covered yet.  don't use them.
+    Sequence writeRecordSequence(float input);
     // 2) play sequence
-    void playSequence(Sequence seq);
+    float playSequence(Sequence seq);
     // 3) output CV
-    void outputCV(Sequence sequence);
+    float outputCV(Sequence sequence);
 };
 
 /*
@@ -396,11 +395,11 @@ struct VCA
     float clippingThresh = 60.55f;
 
     // 1) attenuate or increase gain
-    void* changeGain(void* input); FIXME pointers have not been covered yet.  don't use them.
+    float changeGain(float input, float gain);
     // 2) read CV
-    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
+    float readCV(float CVInput);
     // 3) mix inputs/outputs together
-    void* mixSignals(void* signals); FIXME pointers have not been covered yet.  don't use them.
+    float mixSignals(float signals);
 };
 
 /*
@@ -437,15 +436,15 @@ struct Filter
         float cutoffFreq, resonance;
         unsigned int topology;
 
-        void* transferFunction(void* input); FIXME pointers have not been covered yet.  don't use them.
+        float transferFunction(float input);
     };
 
     // 1) read CV
-    void readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
+    float readCV(float CVInput);
     // 2) apply filter to input
-    void* applyFilter(void* input); FIXME pointers have not been covered yet.  don't use them.
+    float applyFilter(float input);
     // 3) mix outputs together
-    void* mixOutputs(void* outputs); FIXME pointers have not been covered yet.  don't use them.
+    float mixOutputs(float outputs);
 };
 
 /*
@@ -482,11 +481,11 @@ struct Synthesizer
     Oscillator oscillator;
 
     // 1) outputs sounds
-    void outputSound(void* signal); FIXME pointers have not been covered yet.  don't use them.
+    void outputSound(float signal);
     // 2) reads CV
-    void* readCV(void* CVInput); FIXME pointers have not been covered yet.  don't use them.
+    float readCV(float CVInput); 
     // 3) routes CV in mod matrix
-    void routeCV(void* CVInput, unsigned int modMatrixDestination); FIXME pointers have not been covered yet.  don't use them.
+    float routeCV(float CVInput, unsigned int modMatrixDestination); 
 };
 
 #include <iostream>
