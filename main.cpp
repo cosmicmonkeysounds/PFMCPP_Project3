@@ -1,4 +1,4 @@
- /*
+  /*
  Project 3 - Part 2 / 5
  Video: Chapter 2 Part 6
  Implementations tasks
@@ -15,9 +15,45 @@ Create a branch named Part2
     You'll need to insert the Person struct from the video in the space below.
  */
 
+#include <iostream>
 
+struct Person
+{
+    int age, height, distanceTraveled = 0;
+    float hairLength, GPA;
+    unsigned int SATScore;
 
+    struct Foot
+    {
+        void stepForward()
+        {
+            std::cout << "Stepping..." << std::endl;
+        }
+        int stepSize()
+        {
+           return 1; 
+        }
+    };
+    
+    Foot leftFoot, rightFoot;
 
+    void run(bool startWithLeftFoot);
+};
+
+void Person::run(bool startWithLeftFoot)
+{
+    if( startWithLeftFoot )
+    {
+        leftFoot.stepForward();
+        rightFoot.stepForward();
+    }
+    else
+    {
+        rightFoot.stepForward();
+        leftFoot.stepForward();
+    }
+    distanceTraveled += leftFoot.stepSize() + rightFoot.stepSize();
+}
 
  /*
  2) provide implementations for the member functions you declared in your 10 user-defined types from the previous video outside of your UDT definitions.
@@ -35,390 +71,397 @@ send me a DM to check your pull request
  Wait for my code review.
  */
 
-/*
-1)
-Mixing board
-5 properties:
-    1) number of channels 
-    2) number of buss'
-    3) does it have internal effects? (boolean)
-    4) has an EQ (boolean)
-    5) has a compressor (boolean)
-3 things it can do:
-    1) mix channels together on master buss
-    2) mix and send signals to buss'
-    3) amplify/attenuate inputs
-*/
-
 struct MixingBoard
 {
-    // 1. number of input channels 
     unsigned int numberOfChannels = 16;
-    // 2. number of routable mix busses 
     unsigned int numberOfBusses = 4;
-    // 3. if it includes internal effects or not 
     bool doesItHaveFX = false;
-    // 4. does it include an EQ per channel?
     bool doesItHaveEQ = true;
-    // 5. does it have compressors for each channel?
     bool doesItHaveCompression = false;
 
-    // 1. mixes channels together on master buss
-    float processMasterBuss(int channelData);
-    // 2. mixes and sends signals to buss
-    void sendToBuss(int channelData, unsigned int bussSelect);
-    // 3. changes the gain of signals 
-    float changeGain(int channelData, float gain);
+    void processMasterBuss(float channelData);
+    void sendToBuss(float channelData, unsigned int bussSelect);
+    float changeGain(float channelData, float gain);
 };
 
-/*
-2)
-Oscilloscope 
-5 properties:
-    1) number of BNC inputs 
-    2) is it analog? 
-    3) maximum input voltage 
-    4) number of channels in logic analyzer 
-    5) time constant of X-axis
-3 things it can do:
-    1) count frequency of input
-    2) display waveform
-    3) attenuate/amplify waveform
-*/
+float MixingBoard::changeGain(float channelData, float gain)
+{
+    return static_cast<float>(channelData) * gain;
+}
+
+void sendToBuss(float channelData, unsigned int bussSelect)
+{
+    // we haven't touched on arrays, but this is how I'd go about it
+    
+    // auxBuss[bussSelect].data.push_back(channelData)
+
+    // the member 'data' from member auxBuss would be a vector array
+}
+
+void MixingBoard::processMasterBuss(float channelData)
+{
+    // masterBussSignals.push_back(( changeGain(channelData, masterBussLevel) ))
+}
 
 struct Oscilloscope
 {
-    // 1. Number of BNC inputs
     unsigned int numOfBNC = 2;
-    // 2. Is this an analog scope?
     bool isThisScopeAnalog = true;
-    // 3. Maximum input voltage 
     float maxInputVoltage = 130.5f;
-    // 4. Number of logic analyzer channels
     unsigned int numOfLogicChannels = 0;
-    // 5. Time constant on x-axis
     float xAxisTimeConstant = 96.5f;
 
-    // 1. Count frequency of inputs
     float countFrequency(float inputVoltage);
-    // 2. Display input waveforms 
     void displayWaveform(float inputVoltage);
-    // 3. amplify/attenuate input signals
     float changeGain(float inputVoltage, float gain);
 };
 
-/*
-3)
-Television
-5 properties:
-    1) size of screen
-    2) aspect ratio (integer that selects the ratio)
-    3) number of HDMI ports
-    4) number of optical ports
-    5) is it smart? (boolean)
-3 things it can do:
-    1) turn on and off
-    2) receive video from ports 
-    3) control it's pixels
-*/
+float Oscilloscope::countFrequency(float inputVoltage)
+{
+    // F(n) = n(n+1)(n+2)/6
+    // probably (definitely) need an array to do this properly
+    return ( inputVoltage * (inputVoltage + 1) * (inputVoltage + 2) ) / 6.f;
+}
+
+void Oscilloscope::displayWaveform(float inputVoltage)
+{
+    // screen.display(inputVoltage, xAxisTimeConstant, countFrequency(inputVoltage));
+}
+
+float Oscilloscope::changeGain(float inputVoltage, float gain)
+{
+    float saturation = 1.f;
+    if ( inputVoltage > maxInputVoltage )
+    {
+        saturation = 100.f + inputVoltage;
+    }
+    return inputVoltage * gain * saturation;
+}
 
 struct Television
 {
-    // 1) size of screen
     float screenWidth;
-    // 2) aspect ratio (integer that selects the ratio)
     unsigned int aspectRatioSelect;
-    // 3) number of HDMI ports
     unsigned int numOfHDMI = 2;
-    // 4) number of optical ports
     unsigned int numOfOptical = 1;
-    // 5) is it smart?
-    bool isItSmart = false;
+    bool isOn = false, isItSmart = false;
 
-    // 1) Turn on or off
-    float powerCycle();
-    // 2) receive video from ports
-    int readPorts(int data);
-    // 3) control it's pixels
+    void powerCycle();
+    int readPorts(int portNumber);
     void controlPixel(unsigned int pixelNum, float brightness);
 };
 
-/*
-4)
-Speakers
-5 properties:
-    1) how many drivers?
-    2) lowest frequency reproducable at -3dB
-    3) highest frequency reproducable at -3dB
-    4) is it active?
-    5) power rating
-3 things it can do:
-    1) output sound 
-    2) filter input through crossover(s)
-    3) set volume 
-*/
+void Television::powerCycle()
+{
+    isOn = !isOn;
+
+    // if ( isOn )
+    // {
+    //     startup();
+    // }
+    // else
+    // {
+    //     shutdown();
+    // }
+}
+
+int Television::readPorts(int portNumber)
+{
+    // will come back and implement later when more types are revealed
+    return portNumber;
+
+    // vvv Here's a rough sketch vvv
+
+    /*
+    std::vector<int> portData;
+
+    for ( int i = 1; i < numberOfPorts; ++i )
+    {
+        portData.push_back(ports[i].read());
+    }
+
+    return portData;
+    */
+}
+
+void controlPixel(unsigned int pixelNum, float brightness)
+{
+    // pixel[pixelNum].changeBrightness(brightness);
+    // unimplemented
+}
 
 struct Speaker
 {
-    // 1) How many drivers?
     unsigned int numOfDrivers = 2;
-    // 2) Lowest frequency reproducable at -3dB
     float minFrequency = 45.4f;
-    // 3) Highest frequency reproducable at -3dB
     float maxFrequency = 19500.51f;
-    // 4) is it active?
     bool isItActive = true;
-    // 5) Power rating
     float powerRating = 80.f;
-
-    // 1) output sound
-    float outputSound(float signal); 
-    // 2) filter input through crossover
+    int volume;
+ 
     float applyCrossover(float input); 
-    // 3) set volume
-    void setVolume(int volume);
+    void outputSound(float signal);
+    void setVolume(int newVolume);
 };
 
-/*
-5)
-Oscillator 
-5 properties:
-    1) waveform select
-    2) frequency
-    3) amplitude 
-    4) FM enabled
-    5) number of voices
-3 things it can do:
-    1) read and quantize CV
-    2) output sound
-    3) mix voices together
-*/
+float Speaker::applyCrossover(float signal)
+{
+    // this would have some complicated DSP stuff but I'm not even gonna pretend I know what's up
+    // so I'll just return the signal for now
+    return signal;
+}
+
+void Speaker::outputSound(float signal)
+{
+    float sig = applyCrossover(signal);
+    // other DSP stuff
+    sig *= static_cast<float>(volume);
+    // speakers.output(sig);
+}
+
+void Speaker::setVolume(int newVolume)
+{
+    volume = newVolume;
+}
 
 struct Oscillator
 {
-    // 1) waveform select
     unsigned int waveform = 0;
-    // 2) frequency of oscillation
     float frequency = 440.f;
-    // 3) amplitude of signal
     float amplitude = 1.f;
-    // 4) FM enable
     bool FMEnable = false;
-    // 5) number of voices
     unsigned int numOfVoices = 2;
 
-    // 1) read and quantize CV
-    float readCV(float CVSignal);
-    // 2) output sound
-    float outputSound(float audioSignal);
-    // 3) mix voices together 
-    float mixVoices(float voiceSignals);
+    float readCV();
+    void outputSound();
+    float mixVoices(float voiceSignal);
 };
 
-/*
-6)
-LFO
-5 properties:
-    1) value of tempo
-    2) swing amount 
-    3) waveform select 
-    4) minimum speed
-    5) maximum speed
-3 things it can do:
-    1) read CV
-    2) output CV 
-    3) retrigger LFO
-*/
+float Oscillator::readCV()
+{
+    // returns a stream from the inputs
+    return 0.f;
+
+    /*
+    std::vector<float> CVInputs;
+    for ( int i = 1; i <= numOfCVInputs; ++i )
+    {
+        CVInputs.push_back( CVInputPorts[i].read() );
+    }
+    return CVInputs;
+    */
+}
+
+float Oscillator::mixVoices(float voiceSignal)
+{
+    return voiceSignal;
+
+    // voiceSignal would be array that holds all the data for each voice
+    
+    // float mixedSignals = 0;
+    
+    // for ( int i = 1; i <= numOfVoices; ++i )
+    // {
+    //     mixedSignals += voiceSignal[i];
+    // }
+
+    // return mixedSignals;
+}
+
+void Oscillator::outputSound()
+{
+    /*
+    std::vector<float> voiceSignals;
+
+    for ( int i = 1; i <= numOfVoices; ++i )
+    {
+        voiceSignals.push_back(voice[i]);
+    }
+
+    audioOutputPort.output( mixVoices(voiceSignals) )
+    */
+}
 
 struct LFO
 {
-    // 1) value of tempo
     float tempo = 120.f;
-    // 2) swing amount 
     float swingAmount = 50.f;
-    // 3) waveform select
     unsigned int waveform = 0;
-    // 4) minimum speed
     float minSpeed = 0.0001f;
-    // 5) maximum speed
     float maxSpeed = 255.f;
+    float currentValue = 0;
 
-    // 1) read CV
-    float readCV(float CVInput); 
-    // 2) outputCV
-    void outputCV(); // this takes no arguments because everything it needs to output is held in the member variables
-    // 3) retrigger LFO
+    float readCV(); 
+    void outputCV(); 
     void retrigger();
 };
 
-/*
-7)
-Sequencer
-5 properties:
-    1) number of steps
-    2) restart sequence button (boolean)
-    3) value of tempo
-    4) swing amount
-    5) velocity value
-3 things it can do:
-    1) write/record sequence 
-    2) play sequence 
-    3) output CV
-*/
+float LFO::readCV()
+{
+    // returns a stream from the inputs
+    return 0.f;
+}
+
+void LFO::outputCV()
+{
+    // unimplemented 
+}
+
+void LFO::retrigger()
+{
+    currentValue = 0;
+    // the value "currentValue" would likely be different than 0 if the LFO was actually running, making this a crude reset, setting it to the value at instantiation, 0. 
+}
 
 struct Sequencer
 {
-    // 1) Number of steps
     unsigned int numOfSteps = 16;
-    // 2) restart sequence button
     bool restartSequence = false;
-    // 3) value of tempo
     float tempo = 89.5f;
-    // 4) swing amount
     float swing = 45.2f;
-    // 5) velocity value
     float velocity = 90.5f;
+    int instruments;
 
-    // Nested UDT #1
     struct Sequence
     {
-        float data;
-        float instruments;
+        int numOfTracks = 0;
 
-        int quantize(float input);
+        struct Track
+        {
+            float data = 0.f, qntData = data;
+        };
+
+        void quantize(float input);
     };
 
-    // 1) write/record sequence
+    Sequence current_seq;
+    // used playSequence() by default
+
     Sequence writeRecordSequence(float input);
-    // 2) play sequence
     float playSequence(Sequence seq);
-    // 3) output CV
-    float outputCV(Sequence sequence);
+    void outputCV(Sequence seq);
 };
 
-/*
-8)
-VCA
-5 properties:
-    1) number of inputs
-    2) number of outputs
-    3) input signal strength
-    4) output signal strength
-    5) distortion threshold
-3 things it can do:
-    1) attenuate or increase gain
-    2) read CV
-    3) mix inputs/outputs together
-*/
+void Sequencer::Sequence::quantize(float input)
+{
+    // unimplemented 
+}
+
+Sequencer::Sequence Sequencer::writeRecordSequence(float input)
+{
+    Sequencer::Sequence newSequence;
+    float inputStream = input; // vector, etc
+    // does some stuff
+    return newSequence;
+} 
+
+float Sequencer::playSequence(Sequence seq)
+{
+    return 0.f;
+    // returns a stream of "CV" to be used by outputCV
+}
+
+void Sequencer::outputCV(Sequencer::Sequence seq)
+{
+    // unimplemented
+}
 
 struct VCA
 {
-    // 1) number of inputs
-    unsigned int numOfInputs = 2;
-    // 2) number of outputs
-    unsigned int numOfOutputs = 1;
-    // 3) input signal strength
-    float inputStrength = 87.5f;
-    // 4) output signal strength
-    float outputStrength = 20.5f;
-    // 5) distortion threshold
-    float clippingThresh = 60.55f;
+    unsigned int numOfInputs = 2, numOfOutputs = 1;
+    float maxGainOut = 100.f, minGainOut = 20.f, clipThresh = 60.55f, currentGain = 50.f, currentSignal = 10.f, amplifiedSignal;
 
-    // 1) attenuate or increase gain
-    float changeGain(float input, float gain);
-    // 2) read CV
-    float readCV(float CVInput);
-    // 3) mix inputs/outputs together
-    float mixSignals(float signals);
+
+    void applyGain();
+    void saturate(float clipAmount);
+    float readCV();
 };
 
-/*
-9)
-Filter
-5 properties:
-    1) has low pass output
-    2) has band pass output
-    3) has hi pass output
-    4) cutoff frequency value
-    5) resonance value
-3 things it can do:
-    1) read CV
-    2) apply filter to input
-    3) mix outputs together
-*/
+void VCA::saturate(float clipAmount)
+{
+    amplifiedSignal  = clipThresh + ( (clipAmount * currentGain) / (3.14f * clipAmount) );
+}
+
+float VCA::readCV()
+{
+    return 1.f;
+    // not implemented
+}
+
+void VCA::applyGain()
+{
+    amplifiedSignal = currentSignal * ( currentGain - readCV() );
+    if ( amplifiedSignal > clipThresh )
+    {
+        saturate( amplifiedSignal - clipThresh );
+    }
+}
 
 struct Filter
 {
-    // 1) has low pass output
-    bool hasLowPass = true;
-    // 2) has band pass output
-    bool hasBandPass = true;
-    // 3) has high pass output
-    bool hasHighPass = true;
-    // 4) cutoff frequency value
-    float cutoffFreq = 1000.f;
-    // 5) resonance value
-    float resonance = 0.7f;
+    bool hasLowPass = true, hasBandPass = true, hasHighPass = true;
+    float cutoffFreq = 1000.f, resonance = 0.7f;
 
-    // Nested UDT #2
     struct LowPass
     {
         float cutoffFreq, resonance;
         unsigned int topology;
 
         float transferFunction(float input);
-    };
+    } lowPass;
 
-    // 1) read CV
-    float readCV(float CVInput);
-    // 2) apply filter to input
     float applyFilter(float input);
-    // 3) mix outputs together
-    float mixOutputs(float outputs);
 };
 
-/*
-10)
-Synthesizer
-5 properties:
- These 5 properties should be UDTs that you defined above.
- this goes along with the instruction:
-    One of your 10 UDTs should only use UDTs for its member variable types.
-    1) has a filter
-    2) has a vca
-    3) has a sequencer
-    4) has a lfo
-    5) has an oscillator 
-// all of these would be UDT's that would hold the implementation and specifics of each and NOT booleans
+float Filter::LowPass::transferFunction(float input)
+{
+    // DSP stuff; not implemented 
+    return input;
+}
 
-3 things it can do:
-    1) output sounds
-    2) read CV 
-    3) route CV in mod matrix
-*/
+float Filter::applyFilter(float input)
+{
+    float filtered = input; // this will be a vector
+    if ( hasLowPass )
+    {
+        filtered = lowPass.transferFunction(input);
+    }
+    return filtered;
+}
 
 struct Synthesizer
 {
-    // 1) has a filter
-    Filter filter;
-    // 2) has a VCA
-    VCA vca;
-    // 3) has a sequencer
-    Sequencer sequencer;
-    // 4) has a LFO
-    LFO lfo;
-    // 5) has an oscillator
-    Oscillator oscillator;
+    struct Components
+    {
+        Filter filter;
+        VCA vca;
+        Sequencer sequencer;
+        LFO lfo;
+        Oscillator oscillator;
+    } components;
 
-    // 1) outputs sounds
-    void outputSound(float signal);
-    // 2) reads CV
+    void outputSound();
     float readCV(float CVInput); 
-    // 3) routes CV in mod matrix
     float routeCV(float CVInput, unsigned int modMatrixDestination); 
 };
 
-#include <iostream>
+void Synthesizer::outputSound()
+{
+    // unimplemented
+}
+
+float Synthesizer::readCV(float CVInput)
+{
+    return 1.f;
+    // unimplemented
+}
+
+float Synthesizer::routeCV(float CVInput, unsigned int modMatrixDestination)
+{
+    return 1.f;
+    // unimplemented
+}
+
 int main()
 {
     std::cout << "good to go!" << std::endl;
