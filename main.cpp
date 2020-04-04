@@ -587,6 +587,8 @@ int main()
 
     Speaker speaker(2, true);
     speaker.printStuff();
+    
+    std::cout << "This speaker's lowest frequency is: " << speaker.minFrequency << ", highest is: " << speaker.maxFrequency << std::endl;
 
     Oscillator osc(4, true);
     osc.printStuff();
@@ -600,8 +602,13 @@ int main()
     VCA vca(40.f);
     vca.printStuff();
 
+    Filter filter(true, false, false);
+    filter.printStuff();
+    
+    std::cout << "Low pass transfer function outputing: " << filter.lowPass.transferFunction(1.f) << std::endl;
+
     Synthesizer synth;
     synth.printStuff();
-    std::cout << synth.readCV(0.f) << std::endl;
-
+    
+    std::cout << "Currently reading " << synth.readCV(0.f) << " from CV port" << std::endl;
 }
