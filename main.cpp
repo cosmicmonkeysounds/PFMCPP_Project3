@@ -68,8 +68,8 @@ struct MixingBoard
     bool doesItHaveEQ = true;
     bool doesItHaveCompression = false;
 
-    void processMasterBuss(float channelData);
-    void sendToBuss(float channelData, unsigned int bussSelect);
+    void processMasterBuss(float);
+    void sendToBuss(float, unsigned int);
     float changeGain(float channelData, float gain);
 
     MixingBoard(unsigned int channels, unsigned int busses, bool fx, bool eq, bool comp)
@@ -92,7 +92,7 @@ float MixingBoard::changeGain(float channelData, float gain)
     return static_cast<float>(channelData) * gain;
 }
 
-void sendToBuss(float channelData, unsigned int bussSelect)
+void sendToBuss(float, unsigned int)
 {
     // we haven't touched on arrays, but this is how I'd go about it
     
@@ -101,7 +101,7 @@ void sendToBuss(float channelData, unsigned int bussSelect)
     // the member 'data' from member auxBuss would be a vector array
 }
 
-void MixingBoard::processMasterBuss(float channelData)
+void MixingBoard::processMasterBuss(float)
 {
     // masterBussSignals.push_back(( changeGain(channelData, masterBussLevel) ))
 }
@@ -115,7 +115,7 @@ struct Oscilloscope
     float xAxisTimeConstant = 96.5f;
 
     float countFrequency(float inputVoltage);
-    void displayWaveform(float inputVoltage);
+    void displayWaveform(float);
     float changeGain(float inputVoltage, float gain);
 
     Oscilloscope(unsigned int bnc, bool analog, unsigned int logic = 0)
@@ -143,7 +143,7 @@ float Oscilloscope::countFrequency(float inputVoltage)
     return ( inputVoltage * (inputVoltage + 1) * (inputVoltage + 2) ) / 6.f;
 }
 
-void Oscilloscope::displayWaveform(float inputVoltage)
+void Oscilloscope::displayWaveform(float)
 {
     // screen.display(inputVoltage, xAxisTimeConstant, countFrequency(inputVoltage));
 }
@@ -168,7 +168,7 @@ struct Television
 
     void powerCycle();
     int readPorts(int portNumber);
-    void controlPixel(unsigned int pixelNum, float brightness);
+    void controlPixel(unsigned int, float);
 
     Television(float screen = 1920.f, unsigned int ratio = 1)
     {
@@ -215,7 +215,7 @@ int Television::readPorts(int portNumber)
     */
 }
 
-void controlPixel(unsigned int pixelNum, float brightness)
+void controlPixel(unsigned int, float)
 {
     // pixel[pixelNum].changeBrightness(brightness);
     // unimplemented
@@ -392,17 +392,17 @@ struct Sequencer
         struct Track
         {
             float data = 0.f, qntData = data;
-        };
+        } track;
 
-        void quantize(float input);
+        void quantize(float);
     };
 
     Sequence current_seq;
     // used playSequence() by default
 
-    Sequence writeRecordSequence(float input);
-    float playSequence(Sequence seq);
-    void outputCV(Sequence seq);
+    Sequence writeRecordSequence(float);
+    float playSequence(Sequence);
+    void outputCV(Sequence);
 
     Sequencer(float input)
     {
@@ -412,30 +412,29 @@ struct Sequencer
 
     void printStuff()
     {
-        std::cout << "Playing sequence: " << &current_seq << std::endl;
+        std::cout << "Playing data: " << current_seq.track.data << std::endl;
     }
 };
 
-void Sequencer::Sequence::quantize(float input)
+void Sequencer::Sequence::quantize(float)
 {
     // unimplemented 
 }
 
-Sequencer::Sequence Sequencer::writeRecordSequence(float input)
+Sequencer::Sequence Sequencer::writeRecordSequence(float)
 {
     Sequencer::Sequence newSequence;
-    float inputStream = input; // vector, etc
     // does some stuff
     return newSequence;
 } 
 
-float Sequencer::playSequence(Sequence seq)
+float Sequencer::playSequence(Sequence)
 {
     return 0.f;
     // returns a stream of "CV" to be used by outputCV
 }
 
-void Sequencer::outputCV(Sequencer::Sequence seq)
+void Sequencer::outputCV(Sequence)
 {
     // unimplemented
 }
@@ -536,15 +535,16 @@ struct Synthesizer
         Oscillator oscillator = Oscillator(2, false);
 
         // not sure why, but I get a weird error I'm not instantiating correctly if I don't do it this way?
-    } components;
+    }; //components;
+    Components components;
 
     void outputSound();
-    float readCV(float CVInput); 
-    float routeCV(float CVInput, unsigned int modMatrixDestination); 
+    float readCV(float); 
+    float routeCV(float, unsigned int); 
 
     Synthesizer()
     {
-        std::cout << "Address of components: " << &components << std::endl;
+        std::cout << "Making synth! " << std::endl;
 
     }
 
@@ -559,13 +559,13 @@ void Synthesizer::outputSound()
     // unimplemented
 }
 
-float Synthesizer::readCV(float CVInput)
+float Synthesizer::readCV(float)
 {
     return 1.f;
     // unimplemented
 }
 
-float Synthesizer::routeCV(float CVInput, unsigned int modMatrixDestination)
+float Synthesizer::routeCV(float, unsigned int)
 {
     return 1.f;
     // unimplemented
