@@ -71,6 +71,20 @@ struct MixingBoard
     void processMasterBuss(float channelData);
     void sendToBuss(float channelData, unsigned int bussSelect);
     float changeGain(float channelData, float gain);
+
+    MixingBoard(unsigned int channels, unsigned int busses, bool fx, bool eq, bool comp)
+    {
+        numberOfChannels = channels;
+        numberOfBusses = busses;
+        doesItHaveFX = fx;
+        doesItHaveEQ = eq;
+        doesItHaveCompression = comp;
+    }
+
+    void printStuff()
+    {
+        std::cout << "Mixer size is: " << numberOfChannels << " x " << numberOfBusses << std::endl;
+    }
 };
 
 float MixingBoard::changeGain(float channelData, float gain)
@@ -103,6 +117,23 @@ struct Oscilloscope
     float countFrequency(float inputVoltage);
     void displayWaveform(float inputVoltage);
     float changeGain(float inputVoltage, float gain);
+
+    Oscilloscope(unsigned int bnc, bool analog, unsigned int logic = 0)
+    {
+        numOfBNC = bnc;
+        isThisScopeAnalog = analog;
+        numOfLogicChannels = logic;
+        if ( analog )
+        {
+            numOfLogicChannels = 0;
+        }
+    }
+
+    void printStuff()
+    {
+        std::cout << "A " << numOfBNC << " input " << (isThisScopeAnalog ? "analog" : "digital") << " scope with " << numOfLogicChannels << " logic anaylzer channels." << std::endl;
+    }
+
 };
 
 float Oscilloscope::countFrequency(float inputVoltage)
@@ -138,6 +169,17 @@ struct Television
     void powerCycle();
     int readPorts(int portNumber);
     void controlPixel(unsigned int pixelNum, float brightness);
+
+    Television(float screen = 1920.f, unsigned int ratio = 1)
+    {
+        screenWidth = screen;
+        aspectRatioSelect = ratio;
+    }
+
+    void printStuff()
+    {
+        std::cout << "Resolution is " << screenWidth << " by " << ( ( screenWidth / 16.f ) * 9.f ) << std::endl;
+    }
 };
 
 void Television::powerCycle()
@@ -181,16 +223,27 @@ void controlPixel(unsigned int pixelNum, float brightness)
 
 struct Speaker
 {
-    unsigned int numOfDrivers = 2;
+    unsigned int numOfDrivers;
     float minFrequency = 45.4f;
     float maxFrequency = 19500.51f;
-    bool isItActive = true;
+    bool isItActive;
     float powerRating = 80.f;
     int volume;
  
     float applyCrossover(float input); 
     void outputSound(float signal);
     void setVolume(int newVolume);
+
+    Speaker(unsigned int drivers = 2, bool active = true)
+    {
+        numOfDrivers = drivers;
+        isItActive = active;
+    }
+
+    void printStuff()
+    {
+        std::cout << numOfDrivers << " woofers with " << (isItActive ? "active " : "passive ") << "inputs." << std::endl;
+    }
 };
 
 float Speaker::applyCrossover(float signal)
@@ -218,12 +271,23 @@ struct Oscillator
     unsigned int waveform = 0;
     float frequency = 440.f;
     float amplitude = 1.f;
-    bool FMEnable = false;
-    unsigned int numOfVoices = 2;
+    bool FMEnable;
+    unsigned int numOfVoices;
 
     float readCV();
     void outputSound();
     float mixVoices(float voiceSignal);
+
+    Oscillator(unsigned int voices = 2, bool fm = false)
+    {
+        FMEnable = fm;
+        numOfVoices = voices;
+    }
+
+    void printStuff()
+    {
+        std::cout << "A " << numOfVoices << " voice " << (FMEnable ? "FM " : "") << "oscillator" << std::endl; 
+    }
 };
 
 float Oscillator::readCV()
@@ -283,6 +347,16 @@ struct LFO
     float readCV(); 
     void outputCV(); 
     void retrigger();
+
+    LFO(unsigned int wave)
+    {
+        waveform = wave;
+    }
+
+    void printStuff()
+    {
+        std::cout << "Currently outputting " << currentValue << std::endl;
+    }
 };
 
 float LFO::readCV()
@@ -329,6 +403,17 @@ struct Sequencer
     Sequence writeRecordSequence(float input);
     float playSequence(Sequence seq);
     void outputCV(Sequence seq);
+
+    Sequencer(float input)
+    {
+        current_seq = writeRecordSequence(input);
+        outputCV(current_seq);
+    }
+
+    void printStuff()
+    {
+        std::cout << "Playing sequence: " << &current_seq << std::endl;
+    }
 };
 
 void Sequencer::Sequence::quantize(float input)
@@ -358,12 +443,22 @@ void Sequencer::outputCV(Sequencer::Sequence seq)
 struct VCA
 {
     unsigned int numOfInputs = 2, numOfOutputs = 1;
-    float maxGainOut = 100.f, minGainOut = 20.f, clipThresh = 60.55f, currentGain = 50.f, currentSignal = 10.f, amplifiedSignal;
+    float maxGainOut = 100.f, minGainOut = -100.f, clipThresh, currentGain = 50.f, currentSignal = 10.f, amplifiedSignal;
 
 
     void applyGain();
     void saturate(float clipAmount);
     float readCV();
+
+    VCA(float clip = 60.5f)
+    {
+        clipThresh = clip;
+    }
+
+    void printStuff()
+    {
+        std::cout << "Currently at " << currentGain << " dB of gain" << std::endl;
+    }
 };
 
 void VCA::saturate(float clipAmount)
@@ -388,7 +483,7 @@ void VCA::applyGain()
 
 struct Filter
 {
-    bool hasLowPass = true, hasBandPass = true, hasHighPass = true;
+    bool hasLowPass, hasBandPass, hasHighPass;
     float cutoffFreq = 1000.f, resonance = 0.7f;
 
     struct LowPass
@@ -400,6 +495,18 @@ struct Filter
     } lowPass;
 
     float applyFilter(float input);
+
+    Filter(bool lp = true, bool bp = false, bool hp = false)
+    {
+        hasLowPass = lp;
+        hasBandPass = bp;
+        hasHighPass = hp;
+    }
+
+    void printStuff()
+    {
+        std::cout << "A filter with a " << (hasLowPass ? "low pass" : "") << (hasBandPass ? " bandpass " : "") << (hasHighPass ? "highpass " : "") << std::endl;
+    }
 };
 
 float Filter::LowPass::transferFunction(float input)
@@ -422,16 +529,29 @@ struct Synthesizer
 {
     struct Components
     {
-        Filter filter;
-        VCA vca;
-        Sequencer sequencer;
-        LFO lfo;
-        Oscillator oscillator;
+        Filter filter = Filter(true, false, false);
+        VCA vca = VCA(60.5f);
+        Sequencer sequencer = Sequencer(1.0f);
+        LFO lfo = LFO(1);
+        Oscillator oscillator = Oscillator(2, false);
+
+        // not sure why, but I get a weird error I'm not instantiating correctly if I don't do it this way?
     } components;
 
     void outputSound();
     float readCV(float CVInput); 
     float routeCV(float CVInput, unsigned int modMatrixDestination); 
+
+    Synthesizer()
+    {
+        std::cout << "Address of components: " << &components << std::endl;
+
+    }
+
+    void printStuff()
+    {
+        std::cout << "Doing fun synth stuff, bleep bloop" << std::endl;
+    }
 };
 
 void Synthesizer::outputSound()
@@ -454,5 +574,34 @@ float Synthesizer::routeCV(float CVInput, unsigned int modMatrixDestination)
 int main()
 {
     Example::main();
-    std::cout << "good to go!" << std::endl;
+    std::cout << "good to go!" << std::endl << std::endl;
+
+    MixingBoard mix(16, 4, true, true, true);
+    mix.printStuff();
+
+    Oscilloscope oscilloscope(2, true, 0);
+    oscilloscope.printStuff();
+
+    Television tv(1920.f);
+    tv.printStuff();
+
+    Speaker speaker(2, true);
+    speaker.printStuff();
+
+    Oscillator osc(4, true);
+    osc.printStuff();
+
+    LFO lfo(1);
+    lfo.printStuff();
+
+    Sequencer sequencer(1.f);
+    sequencer.printStuff();
+
+    VCA vca(40.f);
+    vca.printStuff();
+
+    Synthesizer synth;
+    synth.printStuff();
+    std::cout << synth.readCV(0.f) << std::endl;
+
 }
