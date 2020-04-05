@@ -274,7 +274,7 @@ struct Oscillator
     void printStuff()
     {
         std::cout << "A " << numOfVoices << " voice " << (FMEnable ? "FM " : "") << "oscillator" << std::endl; 
-    }
+    } 
 };
 
 float Oscillator::readCV()
