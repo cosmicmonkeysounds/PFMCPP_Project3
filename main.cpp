@@ -49,20 +49,15 @@ int main()
 
 struct MixingBoard
 {
-    unsigned int numberOfChannels = 16;
-    unsigned int numberOfBusses = 4;
-    bool doesItHaveFX = false;
-    bool doesItHaveEQ = true;
-    bool doesItHaveCompression = false;
+    unsigned int numberOfChannels, numberOfBusses;
+    bool doesItHaveFX, doesItHaveEQ, doesItHaveCompression;
 
     void processMasterBuss(float);
     void sendToBuss(float, unsigned int);
     float changeGain(float channelData, float gain);
 
-    MixingBoard(unsigned int channels, unsigned int busses, bool fx, bool eq, bool comp)
+    MixingBoard(bool fx, bool eq, bool comp) : numberOfChannels(16), numberOfBusses(4)
     {
-        numberOfChannels = channels;
-        numberOfBusses = busses;
         doesItHaveFX = fx;
         doesItHaveEQ = eq;
         doesItHaveCompression = comp;
@@ -274,7 +269,7 @@ struct Oscillator
     void printStuff()
     {
         std::cout << "A " << numOfVoices << " voice " << (FMEnable ? "FM " : "") << "oscillator" << std::endl; 
-    }
+    } 
 };
 
 float Oscillator::readCV()
@@ -563,7 +558,7 @@ int main()
     Example::main();
     std::cout << "good to go!" << std::endl << std::endl;
 
-    MixingBoard mix(16, 4, true, true, true);
+    MixingBoard mix(true, true, true);
     mix.printStuff();
 
     Oscilloscope oscilloscope(2, true, 0);
