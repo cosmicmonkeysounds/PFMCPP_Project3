@@ -452,12 +452,11 @@ struct Sequencer
 float Sequencer::generateRandomSequence()
 {
     
-    float rand;
+    float rand = 0.f;
     for ( int i = 1; i <= numOfSteps; ++i )
     {
-        float r;
-        rand = r;
-        // I know this is not a proper random function, but I don't want to go outside the scope of this part. Random memory addresses are good for now I hope (: 
+        rand = numOfSteps % i;
+        // I know this is not a proper random function, but I don't want to go outside the scope of this part.
     }
     return rand;
 }
