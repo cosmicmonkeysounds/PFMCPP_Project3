@@ -72,9 +72,6 @@ int main()
 
 //call Example::main() in main()
 
-
-
-
 struct MixingBoard
 {
     unsigned int numberOfChannels, numberOfBusses;
@@ -106,9 +103,15 @@ void sendToBuss(float, unsigned int)
 {
     // we haven't touched on arrays, but this is how I'd go about it
     
-    // auxBuss[bussSelect].data.push_back(channelData)
+    /*
+    for( int i = 1; i < numberOfBusses; i++ )
+    {
+        auxBuss[bussSelect].data.push_back(channelData);
+        // the member 'data' from member auxBuss would be a vector array
+    }
+    */
 
-    // the member 'data' from member auxBuss would be a vector array
+    
 }
 
 void MixingBoard::processMasterBuss(float)
@@ -126,7 +129,7 @@ struct Oscilloscope
 
     float countFrequency(float inputVoltage);
     void displayWaveform(float);
-    float changeGain(float inputVoltage, float gain);
+    float maxGain(float inputVoltage, float gain);
 
     Oscilloscope(unsigned int bnc, bool analog, unsigned int logic = 0)
     {
@@ -158,14 +161,13 @@ void Oscilloscope::displayWaveform(float)
     // screen.display(inputVoltage, xAxisTimeConstant, countFrequency(inputVoltage));
 }
 
-float Oscilloscope::changeGain(float inputVoltage, float gain)
+float Oscilloscope::maxGain(float inputVoltage, float gain)
 {
-    float saturation = 1.f;
-    if ( inputVoltage > maxInputVoltage )
+    while ( inputVoltage * gain < maxInputVoltage )
     {
-        saturation = 100.f + inputVoltage;
+        gain += gain;
     }
-    return inputVoltage * gain * saturation;
+    return gain;
 }
 
 struct Television
@@ -279,7 +281,7 @@ void Speaker::setVolume(int newVolume)
 struct Oscillator
 {
     unsigned int waveform = 0;
-    float frequency = 440.f;
+    float frequency = 440.f, minFreq = 20.f, maxFreq = 20000.f;
     float amplitude = 1.f;
     bool FMEnable;
     unsigned int numOfVoices;
@@ -287,6 +289,7 @@ struct Oscillator
     float readCV();
     void outputSound();
     float mixVoices(float voiceSignal);
+    void sweepFrequency();
 
     Oscillator(unsigned int voices = 2, bool fm = false)
     {
@@ -299,6 +302,15 @@ struct Oscillator
         std::cout << "A " << numOfVoices << " voice " << (FMEnable ? "FM " : "") << "oscillator" << std::endl; 
     } 
 };
+
+void Oscillator::sweepFrequency()
+{
+    for ( float i = minFreq; i <= maxFreq; i += 1.f )
+    {
+        frequency = i;
+        outputSound();
+    }
+}
 
 float Oscillator::readCV()
 {
@@ -357,6 +369,7 @@ struct LFO
     float readCV(); 
     void outputCV(); 
     void retrigger();
+    void cycleWaveform();
 
     LFO(unsigned int wave)
     {
@@ -368,6 +381,15 @@ struct LFO
         std::cout << "Currently outputting " << currentValue << std::endl;
     }
 };
+
+void LFO::cycleWaveform()
+{
+    for ( unsigned int i = 0; i < 4; ++i )
+    {
+        waveform = i;
+        retrigger();
+    }
+}
 
 float LFO::readCV()
 {
@@ -388,7 +410,7 @@ void LFO::retrigger()
 
 struct Sequencer
 {
-    unsigned int numOfSteps = 16;
+    int numOfSteps = 16;
     bool restartSequence = false;
     float tempo = 89.5f;
     float swing = 45.2f;
@@ -397,7 +419,7 @@ struct Sequencer
 
     struct Sequence
     {
-        int numOfTracks = 0;
+        int numOfTracks = 0, steps = 16;
 
         struct Track
         {
@@ -410,6 +432,7 @@ struct Sequencer
     Sequence current_seq;
     // used playSequence() by default
 
+    float generateRandomSequence();
     Sequence writeRecordSequence(float);
     float playSequence(Sequence);
     void outputCV(Sequence);
@@ -425,6 +448,18 @@ struct Sequencer
         std::cout << "Playing data: " << current_seq.track.data << std::endl;
     }
 };
+
+float Sequencer::generateRandomSequence()
+{
+    
+    float rand = 0.f;
+    for ( int i = 1; i <= numOfSteps; ++i )
+    {
+        rand = numOfSteps % i;
+        // I know this is not a proper random function, but I don't want to go outside the scope of this part.
+    }
+    return rand;
+}
 
 void Sequencer::Sequence::quantize(float)
 {
@@ -456,6 +491,7 @@ struct VCA
 
 
     void applyGain();
+    float gainBeforeClipping();
     void saturate(float clipAmount);
     float readCV();
 
@@ -490,6 +526,18 @@ void VCA::applyGain()
     }
 }
 
+float VCA::gainBeforeClipping()
+{
+    float level = currentSignal, gain = 1.f;
+
+    while ( level < clipThresh )
+    {
+        level *= gain;
+        gain += 1.f;
+    }
+    return gain;
+}
+
 struct Filter
 {
     bool hasLowPass, hasBandPass, hasHighPass;
@@ -504,6 +552,7 @@ struct Filter
     } lowPass;
 
     float applyFilter(float input);
+    void filterSweep(float low, float high);
 
     Filter(bool lp = true, bool bp = false, bool hp = false)
     {
@@ -532,6 +581,14 @@ float Filter::applyFilter(float input)
         filtered = lowPass.transferFunction(input);
     }
     return filtered;
+}
+
+void Filter::filterSweep(float low, float high)
+{
+    for ( float i = low; i <= high; i += 1.f )
+    {
+        cutoffFreq = i;
+    }
 }
 
 struct Synthesizer
@@ -591,6 +648,8 @@ int main()
 
     Oscilloscope oscilloscope(2, true, 0);
     oscilloscope.printStuff();
+    
+    std::cout << "Max gain for a signal at 10dB is: " << oscilloscope.maxGain(10.f, 1.f) << "dB" << std::endl;
 
     Television tv(1920.f);
     tv.printStuff();
@@ -609,12 +668,15 @@ int main()
     Sequencer sequencer(1.f);
     sequencer.printStuff();
 
+    std::cout << "Last random value from sequence is: " << sequencer.generateRandomSequence() << std::endl;
+
     VCA vca(40.f);
     vca.printStuff();
 
+    std::cout << "Gain before clipping VCA with current signal: " << vca.gainBeforeClipping() << "dB" << std::endl;
+
     Filter filter(true, false, false);
     filter.printStuff();
-    
     std::cout << "Low pass transfer function outputing: " << filter.lowPass.transferFunction(1.f) << std::endl;
 
     Synthesizer synth;
